@@ -48,7 +48,7 @@ func TestUpdater(t *testing.T) {
   http_archive(
       name = "foo",
       urls = ["http://archive/.zip"],
-      sha256sum = "",
+      sha256 = "",
       strip_prefix = "repo-1234",
   )
 
@@ -83,7 +83,7 @@ Have a nice day!`
   http_archive(
       name = "foo",
       urls = ["http://archive/%[1]s.zip"],
-      sha256sum = "d3c33415db7cef081c5b86d1f1822a056b93a98faf37a7f7e92791f677f3a3c2",
+      sha256 = "d3c33415db7cef081c5b86d1f1822a056b93a98faf37a7f7e92791f677f3a3c2",
       strip_prefix = "repo-%[1]s",
   )
 

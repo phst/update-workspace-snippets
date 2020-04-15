@@ -78,7 +78,7 @@ func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 //   http_archive(
 //       name = "…",
 //       urls = ["https://github.com/owner/repo/archive/〈hash〉.zip"],
-//       sha256sum = "…",
+//       sha256 = "…",
 //       strip_prefix = "repo-〈hash〉",
 //   )
 //
@@ -133,7 +133,7 @@ var beginPattern = regexp.MustCompile(`(?m)^([ \t]*(?://+|#+)?[ \t]*)http_archiv
 
 func (u *Updater) update(b []byte, p string) []byte {
 	urlsPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*urls = \[".+?/)[[:xdigit:]]*(\.zip"\],)$`, p))
-	archiveHashPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*sha256sum = ")[[:xdigit:]]*(",)$`, p))
+	archiveHashPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*sha256 = ")[[:xdigit:]]*(",)$`, p))
 	stripPrefixPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*strip_prefix = ".*?)[[:xdigit:]]*(",)$`, p))
 
 	refHashRepl := []byte(fmt.Sprintf("${1}%s${2}", u.refHash))
