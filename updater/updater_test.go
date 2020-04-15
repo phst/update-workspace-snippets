@@ -49,7 +49,7 @@ func TestUpdater(t *testing.T) {
       name = "foo",
       urls = ["http://archive/.zip"],
       sha256sum = "",
-      strip_prefix = "repo-",
+      strip_prefix = "repo-1234",
   )
 
 Have a nice day!`

@@ -130,9 +130,9 @@ func (u *Updater) Update(file string) error {
 var beginPattern = regexp.MustCompile(`(?m)^([ \t]*(?://+|#+)?[ \t]*)http_archive\($`)
 
 func (u *Updater) update(b []byte, p string) []byte {
-	urlsPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*urls = \[".+/)[[:xdigit:]]*(\.zip"\],)$`, p))
+	urlsPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*urls = \[".+?/)[[:xdigit:]]*(\.zip"\],)$`, p))
 	archiveHashPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*sha256sum = ")[[:xdigit:]]*(",)$`, p))
-	stripPrefixPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*strip_prefix = ".*)[[:xdigit:]]*(",)$`, p))
+	stripPrefixPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*strip_prefix = ".*?)[[:xdigit:]]*(",)$`, p))
 
 	refHashRepl := []byte(fmt.Sprintf("${1}%s${2}", u.refHash))
 	archiveHashRepl := []byte(fmt.Sprintf("${1}%s${2}", u.archiveHash))
