@@ -18,10 +18,12 @@
 //
 // Usage
 //
+// A command like
+//
 //   update-workspace-snippets filename…
 //
-// This updates the specified files so that the workspace snippets in these
-// files point to the latest commit available on GitHub.  Right now this only
+// updates the specified files so that the workspace snippets in these files
+// point to the latest commit available on GitHub.  Right now this only
 // supports commits on the master branch; releases aren’t supported yet.  The
 // current directory must be in a Git repository that has exactly one remote
 // pointing to a GitHub repository.  The listed files should contain an
