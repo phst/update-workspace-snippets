@@ -61,7 +61,8 @@ func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 	if err != nil {
 		return nil, fmt.Errorf("updater: no remote hash for Git repository in %s: %w", dir, err)
 	}
-	archiveURL := url + "/archive/" + refHash.String() + ".zip"
+	// The archive URL doesn’t work with the .git suffix.
+	archiveURL := strings.TrimSuffix(url, ".git") + "/archive/" + refHash.String() + ".zip"
 	archiveHash, err := hashArchive(client, archiveURL)
 	if err != nil {
 		return nil, fmt.Errorf("updater: can’t download archive for Git repository in %s: %w", dir, err)

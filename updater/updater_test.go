@@ -58,7 +58,7 @@ Have a nice day!`
 	hash := commit(t, worktree)
 	push(t, repo, "github", remoteDir)
 
-	archiveDir := filepath.Join(remoteDir, "archive")
+	archiveDir := filepath.Join(tempDir, "remote", "archive")
 	mkdir(t, archiveDir)
 	archiveFile := filepath.Join(archiveDir, hash.String()+".zip")
 	write(t, archiveFile, "archive contents\n")
@@ -132,7 +132,7 @@ func push(t *testing.T, repo *git.Repository, remoteName, remoteDir string) {
 }
 
 func mkdir(t *testing.T, dir string) {
-	if err := os.Mkdir(dir, 0700); err != nil {
+	if err := os.MkdirAll(dir, 0700); err != nil {
 		t.Error(err)
 	}
 }
