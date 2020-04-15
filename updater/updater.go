@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package updater contains the type Updater to update Bazel workspace
+// snippets.
 package updater
 
 import (
