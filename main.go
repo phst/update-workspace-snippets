@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2020, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@
 // supports commits on the master branch; releases aren’t supported yet.  The
 // current directory must be in a Git repository that has exactly one remote
 // pointing to a GitHub repository.  The listed files should contain an
-// “http_archive” stanza pointing to the GitHub repository.
+// “http_archive” stanza pointing to the GitHub repository.  The program also
+// updates comments within the stanza that look like dates.
 //
 // Invoke this program after pushing to GitHub.  Since it modifies the
 // workspace, you’ll typically need to commit and push again, but since it only

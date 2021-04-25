@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2020, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,16 @@
 package updater_test
 
 import (
+	"archive/zip"
+	"bytes"
+	"crypto/sha256"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
@@ -47,7 +51,9 @@ func TestUpdater(t *testing.T) {
 
   http_archive(
       name = "foo",
-      urls = ["http://archive/.zip"],
+      urls = [
+          "http://archive/.zip",   # 2020-07-06
+      ],
       sha256 = "",
       strip_prefix = "repo-1234",
   )
@@ -55,13 +61,24 @@ func TestUpdater(t *testing.T) {
 Have a nice day!`
 	readme := filepath.Join(worktreeDir, "README")
 	write(t, readme, before)
-	hash := commit(t, worktree)
+	commitHash := commit(t, worktree)
 	push(t, repo, "github", remoteDir)
+
+	b := new(bytes.Buffer)
+	w := zip.NewWriter(b)
+	now := time.Date(2021, time.April, 24, 17, 32, 22, 0, time.UTC)
+	if _, err := w.CreateHeader(&zip.FileHeader{Name: "root/", Modified: now}); err != nil {
+		t.Fatal(err)
+	}
+	if err := w.Close(); err != nil {
+		t.Fatal(err)
+	}
+	archiveHash := sha256.Sum256(b.Bytes())
 
 	archiveDir := filepath.Join(tempDir, "remote", "archive")
 	mkdir(t, archiveDir)
-	archiveFile := filepath.Join(archiveDir, hash.String()+".zip")
-	write(t, archiveFile, "archive contents\n")
+	archiveFile := filepath.Join(archiveDir, commitHash.String()+".zip")
+	write(t, archiveFile, b.String())
 
 	transport := new(http.Transport)
 	transport.RegisterProtocol("", http.NewFileTransport(http.Dir("/")))
@@ -82,12 +99,14 @@ Have a nice day!`
 
   http_archive(
       name = "foo",
-      urls = ["http://archive/%[1]s.zip"],
-      sha256 = "d3c33415db7cef081c5b86d1f1822a056b93a98faf37a7f7e92791f677f3a3c2",
+      urls = [
+          "http://archive/%[1]s.zip",  # 2021-04-24
+      ],
+      sha256 = "%[2]x",
       strip_prefix = "repo-%[1]s",
   )
 
-Have a nice day!`, hash)
+Have a nice day!`, commitHash, archiveHash)
 
 	if diff := cmp.Diff(got, want); diff != "" {
 		t.Errorf("file %s: -got +want:\n%s", readme, diff)

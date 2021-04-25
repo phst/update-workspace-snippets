@@ -17,17 +17,18 @@
 package updater
 
 import (
+	"archive/zip"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/bazelbuild/buildtools/build"
 	"github.com/go-git/go-git/v5"
@@ -39,6 +40,7 @@ import (
 type Updater struct {
 	refHash     plumbing.Hash
 	archiveHash archiveHash
+	date        string
 }
 
 // New creates a new Updater.  dir must be a directory within a checked-out Git
@@ -66,11 +68,11 @@ func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 	}
 	// The archive URL doesn’t work with the .git suffix.
 	archiveURL := strings.TrimSuffix(url, ".git") + "/archive/" + refHash.String() + ".zip"
-	archiveHash, err := hashArchive(client, archiveURL)
+	archiveHash, modified, err := downloadArchive(client, archiveURL)
 	if err != nil {
 		return nil, fmt.Errorf("updater: can’t download archive for Git repository in %s: %w", dir, err)
 	}
-	return &Updater{refHash, archiveHash}, nil
+	return &Updater{refHash, archiveHash, modified.Format("2006-01-02")}, nil
 }
 
 // Update updates commit and archive hashes within the given file.
@@ -147,6 +149,12 @@ func (u *Updater) update(b []byte, p string) []byte {
 }
 
 func (u *Updater) visit(x build.Expr, stack []build.Expr) {
+	c := x.Comment()
+	for _, l := range [][]build.Comment{c.Before, c.Suffix, c.After} {
+		for i, c := range l {
+			l[i].Token = datePattern.ReplaceAllLiteralString(c.Token, u.date)
+		}
+	}
 	a, ok := x.(*build.AssignExpr)
 	if !ok {
 		return
@@ -190,6 +198,7 @@ func (u *Updater) visit(x build.Expr, stack []build.Expr) {
 }
 
 var (
+	datePattern        = regexp.MustCompile(`20\d\d-\d\d-\d\d`)
 	urlPattern         = regexp.MustCompile(`^(.+?/)[[:xdigit:]]*(\.zip)$`)
 	sha256Pattern      = regexp.MustCompile(`^[[:xdigit:]]*$`)
 	stripPrefixPattern = regexp.MustCompile(`^(.*?)[[:xdigit:]]*$`)
@@ -238,30 +247,39 @@ func masterHash(remote *git.Remote) (plumbing.Hash, error) {
 	return plumbing.ZeroHash, fmt.Errorf("no master reference in remote %s found", remote)
 }
 
-func hashArchive(client *http.Client, url string) (archiveHash, error) {
-	var r archiveHash
+func downloadArchive(client *http.Client, url string) (archiveHash, time.Time, error) {
 	resp, err := client.Get(url)
 	if err != nil {
-		return r, err
+		return archiveHash{}, time.Time{}, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return r, fmt.Errorf("downloading %s resulting in HTTP status %s", url, resp.Status)
+		return archiveHash{}, time.Time{}, fmt.Errorf("downloading %s resulting in HTTP status %s", url, resp.Status)
 	}
-	hash := sha256.New()
-	if _, err := io.Copy(hash, resp.Body); err != nil {
-		return r, fmt.Errorf("couldn’t download %s: %w", url, err)
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return archiveHash{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
 	}
 	if err := resp.Body.Close(); err != nil {
-		return r, fmt.Errorf("couldn’t download %s: %w", url, err)
+		return archiveHash{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
 	}
-	s := hash.Sum(nil)
-	if len(s) != len(r) {
-		return r, fmt.Errorf("invalid hash size: got %d, want %d", len(s), len(r))
+
+	var modified time.Time
+	r, err := zip.NewReader(bytes.NewReader(b), int64(len(b)))
+	if err != nil {
+		return archiveHash{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
 	}
-	copy(r[:], s)
-	return r, nil
+	for _, f := range r.File {
+		if baseDirPattern.MatchString(f.Name) {
+			modified = f.Modified
+			break
+		}
+	}
+
+	return sha256.Sum256(b), modified, nil
 }
+
+var baseDirPattern = regexp.MustCompile(`^[^/]+/$`)
 
 type archiveHash [sha256.Size]byte
 
