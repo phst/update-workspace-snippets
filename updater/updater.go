@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2020, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/bazelbuild/buildtools/build"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 )
@@ -101,19 +102,18 @@ func (u *Updater) Update(file string) error {
 			break
 		}
 		found = true
-		out.Write(contents[:indices[1]])
-		prefix := regexp.QuoteMeta(string(contents[indices[2]:indices[3]]))
-		contents = contents[indices[1]:]
+		out.Write(contents[:indices[0]])
+		prefix := string(contents[indices[2]:indices[3]])
+		contents = contents[indices[0]:]
 
-		endPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^%s[ \t]*\)$`, prefix))
+		endPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^%s[ \t]*\)$`, regexp.QuoteMeta(prefix)))
 		indices = endPattern.FindIndex(contents)
 		if indices == nil {
 			return fmt.Errorf("updater: http_stanza in file %s not properly terminated", file)
 		}
-		slice := contents[:indices[0]]
+		slice := contents[:indices[1]]
 		out.Write(u.update(slice, prefix))
 
-		out.Write(contents[indices[0]:indices[1]])
 		contents = contents[indices[1]:]
 	}
 
@@ -132,18 +132,68 @@ func (u *Updater) Update(file string) error {
 var beginPattern = regexp.MustCompile(`(?m)^([ \t]*(?://+|#+)?[ \t]*)http_archive\($`)
 
 func (u *Updater) update(b []byte, p string) []byte {
-	urlsPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*urls = \[".+?/)[[:xdigit:]]*(\.zip"\],)$`, p))
-	archiveHashPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*sha256 = ")[[:xdigit:]]*(",)$`, p))
-	stripPrefixPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^(%s[ \t]*strip_prefix = ".*?)[[:xdigit:]]*(",)$`, p))
-
-	refHashRepl := []byte(fmt.Sprintf("${1}%s${2}", u.refHash))
-	archiveHashRepl := []byte(fmt.Sprintf("${1}%s${2}", u.archiveHash))
-
-	b = urlsPattern.ReplaceAll(b, refHashRepl)
-	b = archiveHashPattern.ReplaceAll(b, archiveHashRepl)
-	b = stripPrefixPattern.ReplaceAll(b, refHashRepl)
-	return b
+	b = regexp.MustCompile(fmt.Sprintf(`(?m)^%s`, regexp.QuoteMeta(p))).ReplaceAllLiteral(b, nil)
+	f, err := build.ParseDefault("", b)
+	if err != nil {
+		return b
+	}
+	build.Walk(f, u.visit)
+	b = build.Format(f)
+	// Remove trailing newline since endPattern above hasn’t matched it.
+	if i := len(b) - 1; i >= 0 && b[i] == '\n' {
+		b = b[:i]
+	}
+	return regexp.MustCompile(`(?m)^`).ReplaceAllLiteral(b, []byte(p))
 }
+
+func (u *Updater) visit(x build.Expr, stack []build.Expr) {
+	a, ok := x.(*build.AssignExpr)
+	if !ok {
+		return
+	}
+	i, ok := a.LHS.(*build.Ident)
+	if !ok {
+		return
+	}
+	switch i.Name {
+	case "urls":
+		r, ok := a.RHS.(*build.ListExpr)
+		if !ok || len(r.List) != 1 {
+			break
+		}
+		s, ok := r.List[0].(*build.StringExpr)
+		if !ok {
+			break
+		}
+		m := urlPattern.FindStringSubmatch(s.Value)
+		if m == nil {
+			break
+		}
+		s.Value = m[1] + u.refHash.String() + m[2]
+	case "sha256":
+		r, ok := a.RHS.(*build.StringExpr)
+		if !ok || !sha256Pattern.MatchString(r.Value) {
+			break
+		}
+		r.Value = u.archiveHash.String()
+	case "strip_prefix":
+		r, ok := a.RHS.(*build.StringExpr)
+		if !ok {
+			break
+		}
+		m := stripPrefixPattern.FindStringSubmatch(r.Value)
+		if m == nil {
+			break
+		}
+		r.Value = m[1] + u.refHash.String()
+	}
+}
+
+var (
+	urlPattern         = regexp.MustCompile(`^(.+?/)[[:xdigit:]]*(\.zip)$`)
+	sha256Pattern      = regexp.MustCompile(`^[[:xdigit:]]*$`)
+	stripPrefixPattern = regexp.MustCompile(`^(.*?)[[:xdigit:]]*$`)
+)
 
 func remote(repo *git.Repository, prefix string) (remote *git.Remote, url string, err error) {
 	all, err := repo.Remotes()
