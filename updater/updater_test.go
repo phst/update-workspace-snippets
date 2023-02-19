@@ -61,6 +61,7 @@ func TestUpdater(t *testing.T) {
 Have a nice day!`
 	readme := filepath.Join(worktreeDir, "README")
 	write(t, readme, before)
+	add(t, worktree, "README")
 	commitHash := commit(t, worktree)
 	push(t, repo, "github", remoteDir)
 
@@ -129,6 +130,12 @@ func initLocalRepo(t *testing.T, dir string) (*git.Repository, *git.Worktree) {
 func initRemoteRepo(t *testing.T, dir string) {
 	mkdir(t, dir)
 	if _, err := git.PlainInit(dir, true); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func add(t *testing.T, worktree *git.Worktree, file string) {
+	if _, err := worktree.Add(file); err != nil {
 		t.Fatal(err)
 	}
 }
