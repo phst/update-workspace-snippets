@@ -1,4 +1,4 @@
-// Copyright 2020, 2021 Google LLC
+// Copyright 2020, 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import (
 func TestUpdater(t *testing.T) {
 	tempDir, err := ioutil.TempDir("", "updater-test-")
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	defer os.RemoveAll(tempDir)
 
@@ -90,7 +90,7 @@ Have a nice day!`
 	}
 
 	if err := u.Update(readme); err != nil {
-		t.Errorf("error updating %s: %s", readme, err)
+		t.Fatalf("error updating %s: %s", readme, err)
 	}
 
 	got := read(t, readme)
@@ -129,43 +129,43 @@ func initLocalRepo(t *testing.T, dir string) (*git.Repository, *git.Worktree) {
 func initRemoteRepo(t *testing.T, dir string) {
 	mkdir(t, dir)
 	if _, err := git.PlainInit(dir, true); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 }
 
 func commit(t *testing.T, worktree *git.Worktree) plumbing.Hash {
 	hash, err := worktree.Commit("commit message", &git.CommitOptions{All: true, Author: new(object.Signature)})
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	return hash
 }
 
 func push(t *testing.T, repo *git.Repository, remoteName, remoteDir string) {
 	if _, err := repo.CreateRemote(&config.RemoteConfig{Name: remoteName, URLs: []string{remoteDir}}); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	if err := repo.Push(&git.PushOptions{RemoteName: remoteName}); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 }
 
 func mkdir(t *testing.T, dir string) {
 	if err := os.MkdirAll(dir, 0700); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 }
 
 func read(t *testing.T, name string) string {
 	b, err := ioutil.ReadFile(name)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	return string(b)
 }
 
 func write(t *testing.T, name, contents string) {
 	if err := ioutil.WriteFile(name, []byte(contents), 0600); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 }
