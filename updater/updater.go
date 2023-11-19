@@ -1,4 +1,4 @@
-// Copyright 2020, 2021 Google LLC
+// Copyright 2020, 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -78,12 +78,12 @@ func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 // Update updates commit and archive hashes within the given file.
 // The file must contain at least one stanza of the form
 //
-//   http_archive(
-//       name = "…",
-//       urls = ["https://github.com/owner/repo/archive/〈hash〉.zip"],
-//       sha256 = "…",
-//       strip_prefix = "repo-〈hash〉",
-//   )
+//	http_archive(
+//	    name = "…",
+//	    urls = ["https://github.com/owner/repo/archive/〈hash〉.zip"],
+//	    sha256 = "…",
+//	    strip_prefix = "repo-〈hash〉",
+//	)
 //
 // Update replaces the hashes with the values from the upstream HEAD commit.
 func (u *Updater) Update(file string) error {
