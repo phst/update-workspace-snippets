@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package updater contains the type Updater to update Bazel workspace and
+// Package updater contains the type [Updater] to update Bazel workspace and
 // module snippets.
 package updater
 
@@ -36,17 +36,17 @@ import (
 )
 
 // Updater updates Bazel workspace and module snippets.  The zero Updater is
-// not valid; use New to create Updater objects.
+// not valid; use [New] to create Updater objects.
 type Updater struct {
 	refHash     plumbing.Hash
 	archiveHash archiveHash
 	date        string
 }
 
-// New creates a new Updater.  dir must be a directory within a checked-out Git
-// repository.  The repository must have exactly one remote whose URL starts
-// with urlPrefix (normally https://github.com/).  The remote must support
-// GitHub’s archive functionality.
+// New creates a new [Updater].  dir must be a directory within a checked-out
+// Git repository.  The repository must have exactly one remote whose URL
+// starts with urlPrefix (normally https://github.com/).  The remote must
+// support GitHub’s archive functionality.
 func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 	if urlPrefix == "" {
 		return nil, errors.New("updater: empty URL prefix")
