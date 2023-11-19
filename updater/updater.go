@@ -80,9 +80,9 @@ func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 //
 //	http_archive(
 //	    name = "…",
-//	    urls = ["https://github.com/owner/repo/archive/〈hash〉.zip"],
+//	    urls = ["https://github.com/owner/repo/archive/〈hash〉.zip"],
 //	    sha256 = "…",
-//	    strip_prefix = "repo-〈hash〉",
+//	    strip_prefix = "repo-〈hash〉",
 //	)
 //
 // Update replaces the hashes with the values from the upstream HEAD commit.
