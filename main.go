@@ -17,11 +17,11 @@
 // described in
 // https://docs.bazel.build/versions/3.0.0/skylark/deploying.html#readme.
 //
-// Usage
+// # Usage
 //
 // A command like
 //
-//   update-workspace-snippets filename…
+//	update-workspace-snippets filename…
 //
 // updates the specified files so that the workspace and module snippets in
 // these files point to the latest commit available on GitHub.  Right now this
