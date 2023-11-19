@@ -175,7 +175,7 @@ func (u *Updater) visit(x build.Expr, stack []build.Expr) {
 	switch i.Name {
 	case "commit":
 		r, ok := a.RHS.(*build.StringExpr)
-		if !ok {
+		if !ok || !hashPattern.MatchString(r.Value) {
 			break
 		}
 		r.Value = u.refHash.String()
@@ -195,7 +195,7 @@ func (u *Updater) visit(x build.Expr, stack []build.Expr) {
 		s.Value = m[1] + u.refHash.String() + m[2]
 	case "sha256":
 		r, ok := a.RHS.(*build.StringExpr)
-		if !ok || !sha256Pattern.MatchString(r.Value) {
+		if !ok || !hashPattern.MatchString(r.Value) {
 			break
 		}
 		r.Value = u.archiveHash.String()
@@ -215,7 +215,7 @@ func (u *Updater) visit(x build.Expr, stack []build.Expr) {
 var (
 	datePattern        = regexp.MustCompile(`20\d\d-\d\d-\d\d`)
 	urlPattern         = regexp.MustCompile(`^(.+?/)[[:xdigit:]]*(\.zip)$`)
-	sha256Pattern      = regexp.MustCompile(`^[[:xdigit:]]*$`)
+	hashPattern        = regexp.MustCompile(`^[[:xdigit:]]*$`)
 	stripPrefixPattern = regexp.MustCompile(`^(.*?)[[:xdigit:]]*$`)
 )
 
