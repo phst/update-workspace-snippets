@@ -58,6 +58,15 @@ func TestUpdater(t *testing.T) {
       strip_prefix = "repo-1234",
   )
 
+Or, when using Bzlmod, add the following to your MODULE.bazel file:
+
+  bazel_dep(name = "foo", version = "0")
+  git_override(
+      module_name = "foo",
+      remote = "http://remote/",
+      commit = "",
+  )
+
 Have a nice day!`
 	readme := filepath.Join(worktreeDir, "README")
 	write(t, readme, before)
@@ -105,6 +114,15 @@ Have a nice day!`
       ],
       sha256 = "%[2]x",
       strip_prefix = "repo-%[1]s",
+  )
+
+Or, when using Bzlmod, add the following to your MODULE.bazel file:
+
+  bazel_dep(name = "foo", version = "0")
+  git_override(
+      module_name = "foo",
+      remote = "http://remote/",
+      commit = "%[1]s",
   )
 
 Have a nice day!`, commitHash, archiveHash)

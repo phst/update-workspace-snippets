@@ -78,6 +78,14 @@ func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 // Update updates commit and archive hashes within the given file.
 // The file must contain at least one stanza of the form
 //
+//	git_override(
+//	    module_name = "…",
+//	    remote = "…",
+//	    commit = "〈hash〉",
+//	)
+//
+// or
+//
 //	http_archive(
 //	    name = "…",
 //	    urls = ["https://github.com/owner/repo/archive/〈hash〉.zip"],
@@ -99,19 +107,20 @@ func (u *Updater) Update(file string) error {
 		indices := beginPattern.FindSubmatchIndex(contents)
 		if indices == nil {
 			if !found {
-				return fmt.Errorf("updater: no http_archive stanza in file %s", file)
+				return fmt.Errorf("updater: no git_override or http_archive stanza in file %s", file)
 			}
 			break
 		}
 		found = true
 		out.Write(contents[:indices[0]])
 		prefix := string(contents[indices[2]:indices[3]])
+		stanza := string(contents[indices[4]:indices[5]])
 		contents = contents[indices[0]:]
 
 		endPattern := regexp.MustCompile(fmt.Sprintf(`(?m)^%s[ \t]*\)$`, regexp.QuoteMeta(prefix)))
 		indices = endPattern.FindIndex(contents)
 		if indices == nil {
-			return fmt.Errorf("updater: http_stanza in file %s not properly terminated", file)
+			return fmt.Errorf("updater: %s stanza in file %s not properly terminated", stanza, file)
 		}
 		slice := contents[:indices[1]]
 		out.Write(u.update(slice, prefix))
@@ -131,7 +140,7 @@ func (u *Updater) Update(file string) error {
 	return nil
 }
 
-var beginPattern = regexp.MustCompile(`(?m)^([ \t]*(?://+|#+)?[ \t]*)http_archive\($`)
+var beginPattern = regexp.MustCompile(`(?m)^([ \t]*(?://+|#+)?[ \t]*)(git_override|http_archive)\($`)
 
 func (u *Updater) update(b []byte, p string) []byte {
 	b = regexp.MustCompile(fmt.Sprintf(`(?m)^%s`, regexp.QuoteMeta(p))).ReplaceAllLiteral(b, nil)
@@ -164,6 +173,12 @@ func (u *Updater) visit(x build.Expr, stack []build.Expr) {
 		return
 	}
 	switch i.Name {
+	case "commit":
+		r, ok := a.RHS.(*build.StringExpr)
+		if !ok {
+			break
+		}
+		r.Value = u.refHash.String()
 	case "urls":
 		r, ok := a.RHS.(*build.ListExpr)
 		if !ok || len(r.List) != 1 {
