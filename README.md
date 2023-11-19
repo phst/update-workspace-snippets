@@ -4,7 +4,7 @@
 Bazel `WORKSPACE` and `MODULE.bazel` files.  See the [Go package
 documentation][] for details and usage instructions.
 
-[README snippets]: https://docs.bazel.build/versions/3.0.0/skylark/deploying.html#readme
+[README snippets]: https://bazel.build/rules/deploying#readme
 [Go package documentation]: https://pkg.go.dev/github.com/phst/update-workspace-snippets
 
 This is not an officially supported Google product.

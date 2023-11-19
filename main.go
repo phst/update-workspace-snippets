@@ -14,8 +14,7 @@
 
 // Binary update-workspace-snippets automatically updates snippets for Bazel
 // WORKSPACE and MODULE.bazel files.  These snippets should follow the format
-// described in
-// https://docs.bazel.build/versions/3.0.0/skylark/deploying.html#readme.
+// described in https://bazel.build/rules/deploying#readme.
 //
 // # Usage
 //
