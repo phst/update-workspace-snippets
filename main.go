@@ -1,4 +1,4 @@
-// Copyright 2020, 2021 Google LLC
+// Copyright 2020, 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,8 @@
 // limitations under the License.
 
 // Binary update-workspace-snippets automatically updates snippets for Bazel
-// WORKSPACE files.  These snippets should follow the format described in
+// WORKSPACE and MODULE.bazel files.  These snippets should follow the format
+// described in
 // https://docs.bazel.build/versions/3.0.0/skylark/deploying.html#readme.
 //
 // Usage
@@ -22,13 +23,14 @@
 //
 //   update-workspace-snippets filename…
 //
-// updates the specified files so that the workspace snippets in these files
-// point to the latest commit available on GitHub.  Right now this only
-// supports commits on the master branch; releases aren’t supported yet.  The
-// current directory must be in a Git repository that has exactly one remote
-// pointing to a GitHub repository.  The listed files should contain an
-// “http_archive” stanza pointing to the GitHub repository.  The program also
-// updates comments within the stanza that look like dates.
+// updates the specified files so that the workspace and module snippets in
+// these files point to the latest commit available on GitHub.  Right now this
+// only supports commits on the master branch; releases aren’t supported yet.
+// The current directory must be in a Git repository that has exactly one
+// remote pointing to a GitHub repository.  The listed files should contain at
+// least one “git_override” or “http_archive” stanza pointing to the GitHub
+// repository.  The program also updates comments within the stanza that look
+// like dates.
 //
 // Invoke this program after pushing to GitHub.  Since it modifies the
 // workspace, you’ll typically need to commit and push again, but since it only

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package updater contains the type Updater to update Bazel workspace
-// snippets.
+// Package updater contains the type Updater to update Bazel workspace and
+// module snippets.
 package updater
 
 import (
@@ -35,8 +35,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
-// Updater updates Bazel workspace snippets.  The zero Updater is not valid;
-// use New to create Updater objects.
+// Updater updates Bazel workspace and module snippets.  The zero Updater is
+// not valid; use New to create Updater objects.
 type Updater struct {
 	refHash     plumbing.Hash
 	archiveHash archiveHash
