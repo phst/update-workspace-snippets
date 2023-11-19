@@ -64,7 +64,7 @@ Or, when using Bzlmod, add the following to your MODULE.bazel file:
   git_override(
       module_name = "foo",
       remote = "http://remote/",
-      commit = "",
+      commit = "",   # 2020-07-06
   )
 
 Have a nice day!`
@@ -122,7 +122,7 @@ Or, when using Bzlmod, add the following to your MODULE.bazel file:
   git_override(
       module_name = "foo",
       remote = "http://remote/",
-      commit = "%[1]s",
+      commit = "%[1]s",  # 2021-04-24
   )
 
 Have a nice day!`, commitHash, archiveHash)
