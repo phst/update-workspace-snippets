@@ -41,6 +41,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/phst/update-workspace-snippets/updater"
 )
@@ -51,9 +52,18 @@ func main() {
 	if flag.NArg() == 0 {
 		log.Fatal("no files given")
 	}
-	dir, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
+	// If we’re running under “bazel run”, interpret filenames as relative
+	// to the original directory.
+	dir := os.Getenv("BUILD_WORKING_DIRECTORY")
+	if dir == "" {
+		var err error
+		dir, err = os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	if !filepath.IsAbs(dir) {
+		log.Fatalf("working directory %s isn’t absolute", dir)
 	}
 	u, err := updater.New(dir, http.DefaultClient, "https://github.com/")
 	if err != nil {
@@ -61,6 +71,9 @@ func main() {
 	}
 	success := true
 	for _, file := range flag.Args() {
+		if !filepath.IsAbs(file) {
+			file = filepath.Join(dir, file)
+		}
 		if err := u.Update(file); err != nil {
 			log.Print(err)
 			success = false
