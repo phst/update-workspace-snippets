@@ -18,6 +18,8 @@ import (
 	"archive/zip"
 	"bytes"
 	"crypto/sha256"
+	"crypto/sha512"
+	"encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -55,6 +57,7 @@ func TestUpdater(t *testing.T) {
           "http://archive/.zip",   # 2020-07-06
       ],
       sha256 = "",
+      integrity = "",
       strip_prefix = "repo-1234",
   )
 
@@ -84,6 +87,8 @@ Have a nice day!`
 		t.Fatal(err)
 	}
 	archiveHash := sha256.Sum256(b.Bytes())
+	archiveSHA384 := sha512.Sum384(b.Bytes())
+	integrity := "sha384-" + base64.StdEncoding.EncodeToString(archiveSHA384[:])
 
 	archiveDir := filepath.Join(tempDir, "remote", "archive")
 	mkdir(t, archiveDir)
@@ -113,6 +118,7 @@ Have a nice day!`
           "http://archive/%[1]s.zip",  # 2021-04-24
       ],
       sha256 = "%[2]x",
+      integrity = "%[3]s",
       strip_prefix = "repo-%[1]s",
   )
 
@@ -125,7 +131,7 @@ Or, when using Bzlmod, add the following to your MODULE.bazel file:
       commit = "%[1]s",  # 2021-04-24
   )
 
-Have a nice day!`, commitHash, archiveHash)
+Have a nice day!`, commitHash, archiveHash, integrity)
 
 	if diff := cmp.Diff(got, want); diff != "" {
 		t.Errorf("file %s: -got +want:\n%s", readme, diff)

@@ -20,6 +20,8 @@ import (
 	"archive/zip"
 	"bytes"
 	"crypto/sha256"
+	"crypto/sha512"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -38,9 +40,10 @@ import (
 // Updater updates Bazel workspace and module snippets.  The zero Updater is
 // not valid; use [New] to create Updater objects.
 type Updater struct {
-	refHash     plumbing.Hash
-	archiveHash archiveHash
-	date        string
+	refHash          plumbing.Hash
+	archiveHash      archiveHash
+	archiveIntegrity archiveIntegrity
+	date             string
 }
 
 // New creates a new [Updater].  dir must be a directory within a checked-out
@@ -68,11 +71,11 @@ func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 	}
 	// The archive URL doesn’t work with the .git suffix.
 	archiveURL := strings.TrimSuffix(url, ".git") + "/archive/" + refHash.String() + ".zip"
-	archiveHash, modified, err := downloadArchive(client, archiveURL)
+	archiveHash, archiveIntegrity, modified, err := downloadArchive(client, archiveURL)
 	if err != nil {
 		return nil, fmt.Errorf("updater: can’t download archive for Git repository in %s: %w", dir, err)
 	}
-	return &Updater{refHash, archiveHash, modified.Format("2006-01-02")}, nil
+	return &Updater{refHash, archiveHash, archiveIntegrity, modified.Format("2006-01-02")}, nil
 }
 
 // Update updates commit and archive hashes within the given file.
@@ -90,6 +93,7 @@ func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 //	    name = "…",
 //	    urls = ["https://github.com/owner/repo/archive/〈hash〉.zip"],
 //	    sha256 = "…",
+//	    integrity = "…",
 //	    strip_prefix = "repo-〈hash〉",
 //	)
 //
@@ -199,6 +203,12 @@ func (u *Updater) visit(x build.Expr, stack []build.Expr) {
 			break
 		}
 		r.Value = u.archiveHash.String()
+	case "integrity":
+		r, ok := a.RHS.(*build.StringExpr)
+		if !ok || !integrityPattern.MatchString(r.Value) {
+			break
+		}
+		r.Value = u.archiveIntegrity.String()
 	case "strip_prefix":
 		r, ok := a.RHS.(*build.StringExpr)
 		if !ok {
@@ -216,6 +226,7 @@ var (
 	datePattern        = regexp.MustCompile(`20\d\d-\d\d-\d\d`)
 	urlPattern         = regexp.MustCompile(`^(.+?/)[[:xdigit:]]*(\.zip)$`)
 	hashPattern        = regexp.MustCompile(`^[[:xdigit:]]*$`)
+	integrityPattern   = regexp.MustCompile(`^((sha256|sha384|sha512)-.+)?$`)
 	stripPrefixPattern = regexp.MustCompile(`^(.*?)[[:xdigit:]]*$`)
 )
 
@@ -262,27 +273,27 @@ func masterHash(remote *git.Remote) (plumbing.Hash, error) {
 	return plumbing.ZeroHash, fmt.Errorf("no master reference in remote %s found", remote)
 }
 
-func downloadArchive(client *http.Client, url string) (archiveHash, time.Time, error) {
+func downloadArchive(client *http.Client, url string) (archiveHash, archiveIntegrity, time.Time, error) {
 	resp, err := client.Get(url)
 	if err != nil {
-		return archiveHash{}, time.Time{}, err
+		return archiveHash{}, archiveIntegrity{}, time.Time{}, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return archiveHash{}, time.Time{}, fmt.Errorf("downloading %s resulting in HTTP status %s", url, resp.Status)
+		return archiveHash{}, archiveIntegrity{}, time.Time{}, fmt.Errorf("downloading %s resulting in HTTP status %s", url, resp.Status)
 	}
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return archiveHash{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
+		return archiveHash{}, archiveIntegrity{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
 	}
 	if err := resp.Body.Close(); err != nil {
-		return archiveHash{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
+		return archiveHash{}, archiveIntegrity{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
 	}
 
 	var modified time.Time
 	r, err := zip.NewReader(bytes.NewReader(b), int64(len(b)))
 	if err != nil {
-		return archiveHash{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
+		return archiveHash{}, archiveIntegrity{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
 	}
 	for _, f := range r.File {
 		if baseDirPattern.MatchString(f.Name) {
@@ -291,7 +302,7 @@ func downloadArchive(client *http.Client, url string) (archiveHash, time.Time, e
 		}
 	}
 
-	return sha256.Sum256(b), modified, nil
+	return sha256.Sum256(b), sha512.Sum384(b), modified, nil
 }
 
 var baseDirPattern = regexp.MustCompile(`^[^/]+/$`)
@@ -300,4 +311,10 @@ type archiveHash [sha256.Size]byte
 
 func (h archiveHash) String() string {
 	return hex.EncodeToString(h[:])
+}
+
+type archiveIntegrity [sha512.Size384]byte
+
+func (h archiveIntegrity) String() string {
+	return "sha384-" + base64.StdEncoding.EncodeToString(h[:])
 }
