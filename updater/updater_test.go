@@ -1,4 +1,4 @@
-// Copyright 2020, 2021, 2023 Google LLC
+// Copyright 2020, 2021, 2023, 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -37,7 +36,7 @@ import (
 )
 
 func TestUpdater(t *testing.T) {
-	tempDir, err := ioutil.TempDir("", "updater-test-")
+	tempDir, err := os.MkdirTemp("", "updater-test-")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -188,7 +187,7 @@ func mkdir(t *testing.T, dir string) {
 }
 
 func read(t *testing.T, name string) string {
-	b, err := ioutil.ReadFile(name)
+	b, err := os.ReadFile(name)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -196,7 +195,7 @@ func read(t *testing.T, name string) string {
 }
 
 func write(t *testing.T, name, contents string) {
-	if err := ioutil.WriteFile(name, []byte(contents), 0600); err != nil {
+	if err := os.WriteFile(name, []byte(contents), 0600); err != nil {
 		t.Fatal(err)
 	}
 }

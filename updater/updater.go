@@ -1,4 +1,4 @@
-// Copyright 2020, 2021, 2023 Google LLC
+// Copyright 2020, 2021, 2023, 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"regexp"
@@ -99,7 +99,7 @@ func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 //
 // Update replaces the hashes with the values from the upstream HEAD commit.
 func (u *Updater) Update(file string) error {
-	contents, err := ioutil.ReadFile(file)
+	contents, err := os.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("updater: can’t read file: %w", err)
 	}
@@ -135,7 +135,7 @@ func (u *Updater) Update(file string) error {
 	out.Write(contents)
 
 	temp := file + ".tmp"
-	if err := ioutil.WriteFile(temp, out.Bytes(), 0600); err != nil {
+	if err := os.WriteFile(temp, out.Bytes(), 0600); err != nil {
 		return fmt.Errorf("update: can’t write temporary output file: %w", err)
 	}
 	if err := os.Rename(temp, file); err != nil {
@@ -282,7 +282,7 @@ func downloadArchive(client *http.Client, url string) (archiveHash, archiveInteg
 	if resp.StatusCode != http.StatusOK {
 		return archiveHash{}, archiveIntegrity{}, time.Time{}, fmt.Errorf("downloading %s resulting in HTTP status %s", url, resp.Status)
 	}
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return archiveHash{}, archiveIntegrity{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
 	}
