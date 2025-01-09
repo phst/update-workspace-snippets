@@ -49,5 +49,10 @@ jobs:
           go install honnef.co/go/tools/cmd/staticcheck@latest
       - name: Run tests
         shell: bash
-        run: |
-          make check BAZEL=bazelisk
+        # Work around https://github.com/bazel-contrib/rules_go/issues/4154 and
+        # https://github.com/bazel-contrib/bazel-gazelle/issues/1393.  See
+        # https://github.com/bazel-contrib/rules_go/issues/4154#issuecomment-2433739889.
+        run: >-
+          make check
+          BAZEL=bazelisk
+          BAZELFLAGS='--@rules_go//go/config:pure --define=gotags=purego'
