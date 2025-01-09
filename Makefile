@@ -18,8 +18,6 @@
 SHELL = /bin/sh
 
 BAZEL = bazel
-ADDLICENSE = addlicense
-BUILDIFIER = buildifier
 GO = go
 STATICCHECK = staticcheck
 
@@ -28,8 +26,12 @@ all:
 
 check: all
 	$(BAZEL) test $(BAZELFLAGS) -- //...
-	$(ADDLICENSE) -check -- .
-	$(BUILDIFIER) -mode=check -lint=warn -warnings=all -r -- .
+	$(BAZEL) run $(BAZELFLAGS) -- \
+	  @com_github_google_addlicense//:addlicense \
+	  -check -- "$${PWD}"
+	$(BAZEL) run $(BAZELFLAGS) -- \
+	  @buildifier_prebuilt//:buildifier \
+	  -mode=check -lint=warn -warnings=all -r -- "$${PWD}"
 	$(GO) vet ./...
 	$(STATICCHECK) ./...
 
