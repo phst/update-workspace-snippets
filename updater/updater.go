@@ -70,12 +70,12 @@ func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 		return nil, fmt.Errorf("updater: no remote hash for Git repository in %s: %w", dir, err)
 	}
 	// The archive URL doesn’t work with the .git suffix.
-	archiveURL := strings.TrimSuffix(url, ".git") + "/archive/" + refHash.String() + ".zip"
-	archiveHash, archiveIntegrity, modified, err := downloadArchive(client, archiveURL)
+	archURL := strings.TrimSuffix(url, ".git") + "/archive/" + refHash.String() + ".zip"
+	archHash, archIntegrity, modified, err := downloadArchive(client, archURL)
 	if err != nil {
 		return nil, fmt.Errorf("updater: can’t download archive for Git repository in %s: %w", dir, err)
 	}
-	return &Updater{refHash, archiveHash, archiveIntegrity, modified.Format("2006-01-02")}, nil
+	return &Updater{refHash, archHash, archIntegrity, modified.Format("2006-01-02")}, nil
 }
 
 // Update updates commit and archive hashes within the given file.
@@ -286,8 +286,8 @@ func downloadArchive(client *http.Client, url string) (archiveHash, archiveInteg
 	if err != nil {
 		return archiveHash{}, archiveIntegrity{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
 	}
-	if err := resp.Body.Close(); err != nil {
-		return archiveHash{}, archiveIntegrity{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err)
+	if err1 := resp.Body.Close(); err1 != nil {
+		return archiveHash{}, archiveIntegrity{}, time.Time{}, fmt.Errorf("couldn’t download %s: %w", url, err1)
 	}
 
 	var modified time.Time

@@ -79,11 +79,11 @@ Have a nice day!`
 	b := new(bytes.Buffer)
 	w := zip.NewWriter(b)
 	now := time.Date(2021, time.April, 24, 17, 32, 22, 0, time.UTC)
-	if _, err := w.CreateHeader(&zip.FileHeader{Name: "root/", Modified: now}); err != nil {
-		t.Fatal(err)
+	if _, err1 := w.CreateHeader(&zip.FileHeader{Name: "root/", Modified: now}); err1 != nil {
+		t.Fatal(err1)
 	}
-	if err := w.Close(); err != nil {
-		t.Fatal(err)
+	if err1 := w.Close(); err1 != nil {
+		t.Fatal(err1)
 	}
 	archiveHash := sha256.Sum256(b.Bytes())
 	archiveSHA384 := sha512.Sum384(b.Bytes())
