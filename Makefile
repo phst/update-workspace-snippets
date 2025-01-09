@@ -26,12 +26,9 @@ all:
 
 check: all
 	$(BAZEL) test $(BAZELFLAGS) -- //...
+	$(BAZEL) run $(BAZELFLAGS) -- @addlicense -check -- "$${PWD}"
 	$(BAZEL) run $(BAZELFLAGS) -- \
-	  @com_github_google_addlicense//:addlicense \
-	  -check -- "$${PWD}"
-	$(BAZEL) run $(BAZELFLAGS) -- \
-	  @buildifier_prebuilt//:buildifier \
-	  -mode=check -lint=warn -warnings=all -r -- "$${PWD}"
+	  @buildifier -mode=check -lint=warn -warnings=all -r -- "$${PWD}"
 	$(GO) vet ./...
 	$(STATICCHECK) ./...
 
