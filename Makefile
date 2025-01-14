@@ -17,6 +17,7 @@
 
 SHELL = /bin/sh
 
+GO = go
 BAZEL = bazel
 ADDLICENSE = $(BAZEL) run $(BAZELFLAGS) -- @addlicense
 STATICCHECK = staticcheck
@@ -29,4 +30,5 @@ check: all
 	$(ADDLICENSE) -check -- "$${PWD}"
 	$(STATICCHECK) ./...
 
-install:
+install: check
+	$(GO) install
