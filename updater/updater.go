@@ -266,7 +266,7 @@ func masterHash(remote *git.Remote) (plumbing.Hash, error) {
 		return plumbing.ZeroHash, fmt.Errorf("can’t list remote %s: %w", remote, err)
 	}
 	for _, r := range refs {
-		if r.Name() == plumbing.Master && r.Type() == plumbing.HashReference {
+		if (r.Name() == plumbing.Main || r.Name() == plumbing.Master) && r.Type() == plumbing.HashReference {
 			return r.Hash(), nil
 		}
 	}
