@@ -14,6 +14,7 @@
 
 load("@buildifier//:rules.bzl", "buildifier_test")
 load("@gazelle//:def.bzl", "gazelle")
+load("@phst_license_test//:def.bzl", "license_test")
 load("@rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "nogo")
 
 gazelle(name = "gazelle")
@@ -22,6 +23,12 @@ go_binary(
     name = "update-workspace-snippets",
     srcs = ["main.go"],
     deps = ["//updater"],
+)
+
+license_test(
+    name = "license_test",
+    timeout = "short",
+    marker = "MODULE.bazel",
 )
 
 buildifier_test(

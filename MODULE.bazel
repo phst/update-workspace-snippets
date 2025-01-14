@@ -1,4 +1,4 @@
-# Copyright 2023, 2024 Philipp Stephani
+# Copyright 2023, 2024, 2025 Philipp Stephani
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,13 @@ use_repo(
     "com_github_bazelbuild_buildtools",
     "com_github_go_git_go_git_v5",
     "com_github_google_go_cmp",
-    addlicense = "com_github_google_addlicense",
+)
+
+bazel_dep(name = "phst_license_test", version = "0", dev_dependency = True)
+git_override(
+    module_name = "phst_license_test",
+    commit = "9df4c6d0889aa11c2941180ece8ab97ef06d7f56",
+    remote = "https://github.com/phst/license_test.git",
 )
 
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.0", dev_dependency = True, repo_name = "buildifier")
