@@ -1,4 +1,4 @@
-// Copyright 2020, 2021, 2023 Google LLC
+// Copyright 2020, 2021, 2023, 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 //
 // updates the specified files so that the workspace and module snippets in
 // these files point to the latest commit available on GitHub.  Right now this
-// only supports commits on the master branch; releases aren’t supported yet.
+// only supports commits on the main branch; releases aren’t supported yet.
 // The current directory must be in a Git repository that has exactly one
 // remote pointing to a GitHub repository.  The listed files should contain at
 // least one “git_override” or “http_archive” stanza pointing to the GitHub

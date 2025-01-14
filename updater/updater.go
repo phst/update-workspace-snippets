@@ -65,7 +65,7 @@ func New(dir string, client *http.Client, urlPrefix string) (*Updater, error) {
 	if err != nil {
 		return nil, fmt.Errorf("updater: no GitHub remote for Git repository in %s: %w", dir, err)
 	}
-	refHash, err := masterHash(remote)
+	refHash, err := mainHash(remote)
 	if err != nil {
 		return nil, fmt.Errorf("updater: no remote hash for Git repository in %s: %w", dir, err)
 	}
@@ -260,7 +260,7 @@ func matchingURL(remote *git.Remote, prefix string) string {
 	return ""
 }
 
-func masterHash(remote *git.Remote) (plumbing.Hash, error) {
+func mainHash(remote *git.Remote) (plumbing.Hash, error) {
 	refs, err := remote.List(new(git.ListOptions))
 	if err != nil {
 		return plumbing.ZeroHash, fmt.Errorf("can’t list remote %s: %w", remote, err)
@@ -270,7 +270,7 @@ func masterHash(remote *git.Remote) (plumbing.Hash, error) {
 			return r.Hash(), nil
 		}
 	}
-	return plumbing.ZeroHash, fmt.Errorf("no master reference in remote %s found", remote)
+	return plumbing.ZeroHash, fmt.Errorf("no main reference in remote %s found", remote)
 }
 
 func downloadArchive(client *http.Client, url string) (archiveHash, archiveIntegrity, time.Time, error) {
