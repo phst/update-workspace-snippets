@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@buildifier//:rules.bzl", "buildifier_test")
 load("@gazelle//:def.bzl", "gazelle")
 load("@rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "nogo")
 
@@ -21,6 +22,15 @@ go_binary(
     name = "update-workspace-snippets",
     srcs = ["main.go"],
     deps = ["//updater"],
+)
+
+buildifier_test(
+    name = "buildifier_test",
+    timeout = "short",
+    lint_mode = "warn",
+    lint_warnings = ["all"],
+    no_sandbox = True,
+    workspace = "MODULE.bazel",
 )
 
 nogo(
