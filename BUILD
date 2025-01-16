@@ -12,12 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@buildifier//:rules.bzl", "buildifier_test")
-load("@gazelle//:def.bzl", "gazelle")
-load("@phst_license_test//:def.bzl", "license_test")
-load("@rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "nogo")
-
-gazelle(name = "gazelle")
+load("@rules_go//go:def.bzl", "go_binary")
 
 go_binary(
     name = "update-workspace-snippets",
@@ -25,23 +20,7 @@ go_binary(
     deps = ["//updater"],
 )
 
-license_test(
-    name = "license_test",
-    timeout = "short",
-    marker = "MODULE.bazel",
-)
-
-buildifier_test(
-    name = "buildifier_test",
-    timeout = "short",
-    lint_mode = "warn",
-    lint_warnings = ["all"],
-    no_sandbox = True,
-    workspace = "MODULE.bazel",
-)
-
-nogo(
-    name = "nogo",
-    visibility = ["//visibility:public"],
-    deps = TOOLS_NOGO,
+exports_files(
+    ["MODULE.bazel"],
+    visibility = ["//dev:__pkg__"],
 )
