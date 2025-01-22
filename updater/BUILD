@@ -1,4 +1,4 @@
-# Copyright 2023 Philipp Stephani
+# Copyright 2023, 2025 Philipp Stephani
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ go_library(
     visibility = ["//:__pkg__"],
     deps = [
         "@com_github_bazelbuild_buildtools//build",
-        "@com_github_go_git_go_git_v5//:go_default_library",
-        "@com_github_go_git_go_git_v5//plumbing:go_default_library",
+        "@com_github_go_git_go_git_v5//:go-git",
+        "@com_github_go_git_go_git_v5//plumbing",
     ],
 )
 
@@ -33,10 +33,10 @@ go_test(
     srcs = ["updater_test.go"],
     deps = [
         ":updater",
-        "@com_github_go_git_go_git_v5//:go_default_library",
-        "@com_github_go_git_go_git_v5//config:go_default_library",
-        "@com_github_go_git_go_git_v5//plumbing:go_default_library",
-        "@com_github_go_git_go_git_v5//plumbing/object:go_default_library",
+        "@com_github_go_git_go_git_v5//:go-git",
+        "@com_github_go_git_go_git_v5//config",
+        "@com_github_go_git_go_git_v5//plumbing",
+        "@com_github_go_git_go_git_v5//plumbing/object",
         "@com_github_google_go_cmp//cmp",
     ],
 )
