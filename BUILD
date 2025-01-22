@@ -12,11 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_go//go:def.bzl", "go_binary")
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
 
 go_binary(
     name = "update-workspace-snippets",
+    embed = [":lib"],
+    visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "lib",
     srcs = ["main.go"],
+    importpath = "github.com/phst/update-workspace-snippets",
+    visibility = ["//visibility:private"],
     deps = ["//updater"],
 )
 
