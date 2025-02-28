@@ -14,7 +14,7 @@
 
 module github.com/phst/update-workspace-snippets
 
-go 1.22.0
+go 1.23.6
 
 require (
 	github.com/bazelbuild/buildtools v0.0.0-20250204160707-ad48c76ab9b5
