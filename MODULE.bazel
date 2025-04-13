@@ -19,8 +19,8 @@ bazel_dep(name = "gazelle", version = "0.42.0")
 
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
 
-# FIXME: Remove once version 1.23 or later becomes the default (probably with
-# rules_go 0.54).
+# FIXME: Use go_sdk.from_file once
+# https://github.com/bazel-contrib/rules_go/issues/4307 is fixed.
 go_sdk.download(version = "1.23.6")
 go_sdk.nogo(nogo = "//dev:nogo")
 
