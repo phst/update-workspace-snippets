@@ -17,7 +17,7 @@ module github.com/phst/update-workspace-snippets
 go 1.23.6
 
 require (
-	github.com/bazelbuild/buildtools v0.0.0-20250527093549-9029539f409b
+	github.com/bazelbuild/buildtools v0.0.0-20250527150035-5d1447716aec
 	github.com/go-git/go-git/v5 v5.16.0
 	github.com/google/go-cmp v0.7.0
 )
