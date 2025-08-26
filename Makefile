@@ -18,8 +18,7 @@
 SHELL = /bin/sh
 
 BAZEL = bazel
-GO = $(BAZEL) run $(BAZELFLAGS) \
-  --run_under='cd "$${BUILD_WORKING_DIRECTORY}" &&' -- @rules_go//go
+GO = $(BAZEL) run $(BAZELFLAGS) -- @rules_go//go
 STATICCHECK = staticcheck
 
 all:
