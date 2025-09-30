@@ -85,6 +85,8 @@ github.com/bazelbuild/buildtools v0.0.0-20250926132224-6c4b75d79427 h1:XDWJuFrhy
 github.com/bazelbuild/buildtools v0.0.0-20250926132224-6c4b75d79427/go.mod h1:PLNUetjLa77TCCziPsz0EI8a6CUxgC+1jgmWv0H25tg=
 github.com/bazelbuild/buildtools v0.0.0-20250930101331-8f135a59a74a h1:YPD+c3++zNKinAK7eT9c9YpvJ2vTbwJuRRNBTkAidac=
 github.com/bazelbuild/buildtools v0.0.0-20250930101331-8f135a59a74a/go.mod h1:PLNUetjLa77TCCziPsz0EI8a6CUxgC+1jgmWv0H25tg=
+github.com/bazelbuild/buildtools v0.0.0-20250930140053-2eb4fccefb52 h1:njQAmjTv/YHRm/0Lfv9DXHFZ4MdT2IA/RKHTnqZkgDw=
+github.com/bazelbuild/buildtools v0.0.0-20250930140053-2eb4fccefb52/go.mod h1:PLNUetjLa77TCCziPsz0EI8a6CUxgC+1jgmWv0H25tg=
 github.com/cloudflare/circl v1.5.0 h1:hxIWksrX6XN5a1L2TI/h53AGPhNHoUBo+TD1ms9+pys=
 github.com/cloudflare/circl v1.5.0/go.mod h1:uddAzsPgqdMAYatqJ0lsjX1oECcQLIlRpzZh3pJrofs=
 github.com/cloudflare/circl v1.6.0 h1:cr5JKic4HI+LkINy2lg3W2jF8sHCVTBncJr5gIIq7qk=
