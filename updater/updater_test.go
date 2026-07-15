@@ -1,4 +1,4 @@
-// Copyright 2020, 2021, 2023, 2025 Google LLC
+// Copyright 2020, 2021, 2023, 2025, 2026 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/google/go-cmp/cmp"
+
 	"github.com/phst/update-workspace-snippets/updater"
 )
 
