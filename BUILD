@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@gazelle//:def.bzl", "gazelle")
 load("@rules_go//go:go_binary.bzl", "go_binary")
 load("@rules_go//go:go_library.bzl", "go_library")
+
+gazelle(name = "gazelle")
 
 go_binary(
     name = "update-workspace-snippets",
