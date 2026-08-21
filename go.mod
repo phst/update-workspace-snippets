@@ -50,7 +50,7 @@ require (
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/tools v0.44.1-0.20260420230617-19499e7caabc // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	honnef.co/go/tools v0.8.0 // indirect
+	honnef.co/go/tools v0.8.1 // indirect
 )
 
 tool (
