@@ -21,7 +21,7 @@ go_library(
     importpath = "github.com/phst/update-workspace-snippets/updater",
     visibility = ["//:__pkg__"],
     deps = [
-        "@com_github_bazelbuild_buildtools//build",
+        "@com_github_bazel_contrib_buildtools_v10//build",
         "@com_github_go_git_go_git_v5//:go-git",
         "@com_github_go_git_go_git_v5//plumbing",
     ],
