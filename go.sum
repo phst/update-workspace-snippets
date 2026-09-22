@@ -13,6 +13,8 @@ github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 h1:0CwZNZbxp69SHPd
 github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5/go.mod h1:wHh0iHkYZB8zMSxRWpUBQtwG5a7fFgvEO+odwuTv2gs=
 github.com/bazel-contrib/buildtools/v10 v10.0.1 h1:EDWvBDkDuYgKCt0OOVTFjaYCPQMzGKUISCdjBjXV53c=
 github.com/bazel-contrib/buildtools/v10 v10.0.1/go.mod h1:r2TrnWEmFBvbYF1T/SkhkNccU/4vX69SCp9yY6las9M=
+github.com/bazel-contrib/buildtools/v10 v10.1.0 h1:3oWCeWz9PgOFqU5tJvgYJhF0Fi6IRlaJAybCdaY1WhE=
+github.com/bazel-contrib/buildtools/v10 v10.1.0/go.mod h1:r2TrnWEmFBvbYF1T/SkhkNccU/4vX69SCp9yY6las9M=
 github.com/bmatcuk/doublestar/v4 v4.0.2 h1:X0krlUVAVmtr2cRoTqR8aDMrDqnB36ht8wpWTiQ3jsA=
 github.com/bmatcuk/doublestar/v4 v4.0.2/go.mod h1:xBQ8jztBU6kakFMg+8WGxn0c6z1fTSPVIjEY1Wr7jzc=
 github.com/cloudflare/circl v1.6.3 h1:9GPOhQGF9MCYUeXyMYlqTR6a5gTrgR/fBLXvUgtVcg8=
